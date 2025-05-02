@@ -1,0 +1,46 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://llmproxy:dbpassword9090@db:5432/litellm
+      - STORE_MODEL_IN_DB=True
+    env_file:
+      - .env
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml"]
+    init: true
+
+  db:
+    image: postgres
+    restart: always
+    container_name: litellm-db
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: llmproxy
+      POSTGRES_PASSWORD: dbpassword9090
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+
+volumes:
+  ollama: {}
+  litellm: {}
+  
