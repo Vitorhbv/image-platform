@@ -1,8 +1,8 @@
 model_list:
-  - model_name: "gemma3"
-    litellm_params: 
-      model: "ollama/gemma3:latest"
-      api_base: "http://ollama:11434"
+  - model_name: flux-sdxl               # whatever name you want downstream
+    litellm_params:
+      model: huggingface/black-forest-labs/FLUX.1-dev
+      api_key: os.environ/HF_TOKEN
   - model_name: "llava"
     litellm_params: 
       model: "ollama/llava:7b"
